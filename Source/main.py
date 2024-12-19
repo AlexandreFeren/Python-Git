@@ -4,31 +4,70 @@ constantly run this, awaiting commands for version control.
 '''
 import sys
 import os
-import warnings
 
 class Main:
-    def __init__(self):
-        self.commands = ['diff','Work_Tree.init']
+    '''
+    functions considering adding and rough groupings:
     
-    def parse_args(self,args):
-        args = args.split()
-        if args:
-            args[0] = args[0]+".py"
-        return args
+    initialization/info
+        - init
+        - clone
 
-    def call_command(self, argv):
-        if argv == []: return
-        full_path = os.path.dirname(os.path.realpath(__file__))+"\\Work_Tree\\"+argv[0]
-        cwd = os.getcwd()
-        sys.argv = argv
-        if argv[0][:-3] in self.commands:
-            with open(full_path) as f:
-                exec(f.read(),{'argv':argv})
-            return [full_path,cwd,argv]
-        else: 
-            warnings.warn("function '"+argv[0][:-3]+"' does not exist")
+    info
+        - diff
+        - show
+        - help
+        - log
+        - blame
+        
+    file moves
+        - add
+        - mv
+        - rm
+    
+    interact with remote
+        - reset
+        - restore
+        - fetch
+        - commit
+        - remote
+        - pull
+        
+    branching
+        - branch
+        - checkout
+        - merge
+        - stash
+        
+    change cleanup
+        - rebase
+
+    under the hood
+        - blob creation (on add)
+    '''
+    def __init__(self):
+        # should be able to dynamically generate this dict
+        # just exclude non-source folders
+        # and create from the rest
+        self.commands = {
+            "\\Initialization\\":[
+                "init",
+                "clone"
+            ]
+        }
+
+    def call_command(self, args):
+        path = os.path.dirname(os.path.realpath(__file__))
+        for val,key in enumerate(self.commands):
+            if args[0] in self.commands[key]:
+                self.exec_command(path,key,args)
+    
+    def exec_command(self,path,folder,args):
+        full_path = path + folder + args[0] + ".py"
+        with open(full_path) as f:
+                exec(f.read(),{'argv':args})
 
 if __name__ == '__main__':
     main = Main()
-    argv = main.parse_args(input())
-    getattr(main, 'call_command')(argv)
+    if len(sys.argv) > 1:
+        main.call_command(sys.argv[1:])

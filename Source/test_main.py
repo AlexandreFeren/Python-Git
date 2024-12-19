@@ -13,21 +13,8 @@ class CustomTestResult(unittest.TextTestResult):
 
 class TestFunctionCalls(unittest.TestCase):    
     test_args = ["","none",'diff 1','diff','init',"*","$"]
-    file_loc = os.path.dirname(os.path.realpath(__file__))+"\\Work_Tree\\"
-    def test_call_command_scope(self):
-        '''
-        check that the path that call_command is working on
-        is the same as the path that this program is called from
-        '''
-        print("\n\t" + inspect.currentframe().f_code.co_name,end = "")
-        args = self.test_args[2]
-        m = main.Main()
-        ret = m.call_command(m.parse_args(args))
-        if args.split()[0] in m.commands:
-            self.assertEqual(ret[1],os.getcwd())
-        else:
-            self.assertEqual(ret,None)
-    
+    file_loc = os.path.dirname(os.path.realpath(__file__))+"\\Staging\\"
+
     def test_parse_args(self):
         """
         test that arguments are parsed correctly
@@ -44,7 +31,10 @@ class TestFunctionCalls(unittest.TestCase):
 def run_tests():
     test_modules = [
         "test_main",
-        "Work_Tree.test_work_tree"
+        "Remote.test_remote",
+        "Branch.test_branching",
+        "Staging.test_staging",
+        "Upkeep.test_upkeep"
     ]
 
     suite = unittest.TestSuite()
