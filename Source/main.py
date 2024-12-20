@@ -4,6 +4,7 @@ constantly run this, awaiting commands for version control.
 '''
 import sys
 import os
+import Initialization.init as init
 
 class Main:
     '''
@@ -60,12 +61,17 @@ class Main:
         path = os.path.dirname(os.path.realpath(__file__))
         for val,key in enumerate(self.commands):
             if args[0] in self.commands[key]:
-                self.exec_command(path,key,args)
+                self.dispatch(key,args)
+                return
+        print("not a valid command")
     
-    def exec_command(self,path,folder,args):
-        full_path = path + folder + args[0] + ".py"
-        with open(full_path) as f:
-                exec(f.read(),{'argv':args})
+    def dispatch(self,folder,args):
+        '''
+        func_dict is a list of functions to call
+        based on command line args
+        '''
+        func_dict = {"init":init.init}
+        func_dict[args[0]](args)
 
 if __name__ == '__main__':
     main = Main()
