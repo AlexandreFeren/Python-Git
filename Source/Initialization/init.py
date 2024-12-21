@@ -1,4 +1,5 @@
 '''
+TODO: hide .git folder after move, move to correct location
 Attempt to create a new version control directory
 Check down file system to see if in repo
 '''
@@ -7,35 +8,39 @@ import sys
 import subprocess
 import warnings
 import shutil
+from platform import system
+from subprocess import call
 
+def hide(path,command="HIDE"):
+    #hide either folder or file
+    if path[-1]=='\\' or path[-1]=='/':
+        path = path[:-1]
+    if os.path.isfile(path):
+        os.system(f'attrib +h "{path}"')
+    elif os.path.isdir(path):
+        os.system(f'attrib +h "{path}"')
+    
 def re_init(git_dir):
     # TODO: pull in templates as needed
     return
 
-def repl(curr,dest):
-    print(curr,dest)
-    shutil.move(curr,dest)
-    with open(curr,'a+') as symlink:
-        symlink.write("gitdir: "+dest)
-            
 def move_dir(dest):
-    # TODO: move file, make symlink
+    # TODO: cleanup
     """
     Args:
         curr (str): current location of .git folder
         dest (str): destination of .git folder, including \\.git at end
-
-    Raises:
-        Exception: target must be empty
     """
-    curr = os.getcwd()+'\\.git'
-    if os.path.exists(curr):
-        if os.path.exists(dest):
-            if os.listdir(dest) == []:
-                repl(curr,dest)
-        else:
-            os.makedirs(dest)
-            repl(curr,dest)
+    source = os.getcwd()+'\\.git'
+    for file_name in os.listdir(source):
+        shutil.move(os.path.join(source,file_name),dest)
+    os.rmdir(source)
+    #make symlink and hide both that and folder
+    with open(source,'a') as symlink:
+        symlink.write("gitdir: "+source)
+    hide(source)
+    hide(dest)
+
     
 def is_git_dir(path):
     '''
@@ -93,7 +98,9 @@ def add_files(path,branch):
     if not os.path.isdir(path+'\\refs\\heads'): os.makedirs(path+'\\refs\\heads')
     if not os.path.isdir(path+'\\refs\\tags'): os.makedirs(path+'\\refs\\tags')
     
-    with open(path+'\\HEAD','a+') as HEAD: HEAD.write("refs\\heads\\"+branch)
+    with open(path+'\\HEAD','a+') as HEAD: 
+        HEAD.write("refs\\heads\\"+branch)
+        HEAD.close()
     open(path+'\\config','a+')
     open(path+'\\description','a+')
 
@@ -138,7 +145,9 @@ def init(args):
 
     symlink = None
     
-    if git_dir != '': symlink = True
+    if git_dir != '':
+        symlink = True
+        bare = ""   # we are moving just the files in with symlink
     else: 
         symlink = False
         git_dir = os.getcwd()+bare
@@ -160,31 +169,30 @@ def init(args):
         re_init(git_dir)
         if not quiet: print('Reinitialized existing Git repository in '+git_dir)
     else:
-        # check for symlinks
-        if symlink:
+        if symlink: # Tested
             #check for .git file, should not be there
             if os.path.isfile(os.getcwd()+'\\.git'):
                 print('not a valid git repository')
-                return
-            if os.path.isdir(os.getcwd()+'\\.git'):
+            elif os.path.isdir(os.getcwd()+'\\.git'):
+                # need to move dir and make symlink
                 move_dir(git_dir)
-            else:
+            else: # git directory does not exist, initialize and make symlink
                 add_files(git_dir,branch)
-                # hide git_dir folder from command line arg
-                print(git_dir)
-                subprocess.check_call(["attrib","+H",git_dir])
-
+                hide(git_dir) # hide git_dir folder with command line args
             return
         
-        # initialize empty
+        # normal init,make directory
         if bare == '\\.git' and not(os.path.isdir(git_dir)) and not(symlink):
             os.makedirs(git_dir)
             subprocess.check_call(["attrib","+H",git_dir])  # hide .git folder
+        # add files, either to .\\.git or .
         add_files(git_dir,branch)
         
         # set symlink if needed
         if symlink and not '.git' in os.listdir(os.getcwd()):
             with open(os.getcwd()) as symlink:
+                print("???")
                 symlink.write("gitdir: "+git_dir)
                 subprocess.check_call(["attrib","+H",os.getcwd()+'\\.git'])  # hide .git file
+                symlink.close()
         if not quiet: print("Initialized empty Git repository in "+git_dir)

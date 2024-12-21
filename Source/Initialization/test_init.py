@@ -32,7 +32,7 @@ class TestInit(unittest.TestCase):
         that is called to test init. Otherwise, effect order
         would be liable to change.
         folder structure should always be:
-        .git
+        .git (not used if bare)
             > hooks
             > info
             > objects
@@ -41,6 +41,20 @@ class TestInit(unittest.TestCase):
             config
             description
             index
+            
+        test cases:
+            - init plain
+            - init bare
+            - init remote
+            - reinit bare
+            - reinit remote
+            - reinit plain
+            - init, then init remote to move
+            - init remote, delete, remote, then init remote again
+            
+            for all:
+            - check that .git folder gets hidden
+            - check that all required files are in directory
         '''
         # make sure there is no .git folder to avoid real repo
         self.assertFalse('.git' in os.listdir(os.getcwd()))
@@ -58,7 +72,7 @@ class TestInit(unittest.TestCase):
     
     def check_dir(self,path):
         expected_dirs = ['hooks','info','objects','refs']
-        expected_files = ['HEAD','config','description','index']
+        expected_files = ['HEAD','config','description']
         
         for _,dirs,files in os.walk(path):
             # check all expected directories/files exist
