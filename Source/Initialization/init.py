@@ -6,12 +6,20 @@ import os
 import sys
 import subprocess
 import warnings
+import shutil
 
 def re_init(git_dir):
     # TODO: pull in templates as needed
     return
 
+def repl(curr,dest):
+    print(curr,dest)
+    shutil.move(curr,dest)
+    with open(curr,'a+') as symlink:
+        symlink.write("gitdir: "+dest)
+            
 def move_dir(dest):
+    # TODO: move file, make symlink
     """
     Args:
         curr (str): current location of .git folder
@@ -21,29 +29,13 @@ def move_dir(dest):
         Exception: target must be empty
     """
     curr = os.getcwd()+'\\.git'
-    print("curr "+curr)
-    # TODO: move file, make symlink
-    if not os.path.isabs(dest):
-        # TODO: create path if it does not exist
-        dest = os.getcwd()+dest[1:]
-        if not os.path.exists(dest): raise Exception("path "+dest+" does not exist")
-
-    if os.path.isabs(dest):
-        print("move"+curr,dest)
-        if os.listdir(dest) == [] and os.path.exists(curr):
-            os.replace(curr,dest)
-            with open(curr,'a+') as symlink:
-                symlink.write("gitdir: "+dest)
-        else: raise Exception("unable to move",curr,"to",dest+": Directory not empty")
-    else:
-        if os.listdir(dest) == [] and os.path.exists(curr):
-            # print(curr,dest[1:])
-            os.replace(curr,dest)
-            with open(curr,'a+') as symlink:
-                symlink.write("gitdir: "+dest)
-        else: raise Exception("unable to move",curr,"to",dest+": Directory not empty")
-        # with open(curr,'a+') as symlink:
-        #         symlink.write("gitdir: "+dest)
+    if os.path.exists(curr):
+        if os.path.exists(dest):
+            if os.listdir(dest) == []:
+                repl(curr,dest)
+        else:
+            os.makedirs(dest)
+            repl(curr,dest)
     
 def is_git_dir(path):
     '''
@@ -118,7 +110,7 @@ def init(args):
             - create without .git folder below newly created
         TODO: [--template = <template-directory>]
             - specify template directory
-        TODO: [--separate-git-dir <git-dir>] 
+        [--separate-git-dir <git-dir>] 
             - create symlink as text file pointing to repo named '.git'. 
             works similarly to --bare from that location, cannot be used with --bare
             - if repo exists in context, moves current git repo to that path
@@ -139,9 +131,11 @@ def init(args):
                     - no permissions:   0000
     '''
     quiet,bare,template,git_dir,object_format,branch,shared = format_init_args(args[1:])
+    
+    # basic flag error checking
     if bare == '' and git_dir != '': raise ValueError("fatal: options '--separate-git-dir' and '--bare' cannot be used together")
     
-    
+
     symlink = None
     
     if git_dir != '': symlink = True
@@ -149,7 +143,8 @@ def init(args):
         symlink = False
         git_dir = os.getcwd()+bare
     
-    # basic flag error checking
+    if not os.path.isabs(git_dir): git_dir = os.getcwd()+git_dir[1:]
+    
     
     
     if is_git_dir(git_dir):
@@ -158,6 +153,7 @@ def init(args):
         # with separate-git-dir (to empty repo)
         # or pick up new templates
         if symlink:
+            # TODO: .git folder name not required, fix this.
             if os.path.isdir(os.getcwd()+'\\.git'):
                 move_dir(git_dir)
         
@@ -166,10 +162,18 @@ def init(args):
     else:
         # check for symlinks
         if symlink:
+            #check for .git file, should not be there
+            if os.path.isfile(os.getcwd()+'\\.git'):
+                print('not a valid git repository')
+                return
             if os.path.isdir(os.getcwd()+'\\.git'):
-                print("move for symlink")
                 move_dir(git_dir)
-                pass
+            else:
+                add_files(git_dir,branch)
+                # hide git_dir folder from command line arg
+                print(git_dir)
+                subprocess.check_call(["attrib","+H",git_dir])
+
             return
         
         # initialize empty
