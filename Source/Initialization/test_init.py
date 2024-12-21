@@ -51,11 +51,14 @@ class TestInit(unittest.TestCase):
             - reinit plain
             - init, then init remote to move
             - init remote, delete, remote, then init remote again
+            - init both bare and remote
+            - custom branch name
             
             for all:
             - check that .git folder gets hidden
             - check that all required files are in directory
         '''
+        test_commands={"bare":"--bare","quiet":"-q","remote":"--separate-git-dir=./git_playground","branch":"-b='main'"}
         # make sure there is no .git folder to avoid real repo
         self.assertFalse('.git' in os.listdir(os.getcwd()))
         
