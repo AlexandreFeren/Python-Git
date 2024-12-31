@@ -29,15 +29,19 @@ def move_dir(dest):
     """
     Args:
         curr (str): current location of .git folder
-        dest (str): destination of .git folder, including /.git at end
+        dest (str): destination of .git folder, including /<folder-name> at end
     """
     source = os.getcwd()+'/.git'
+    #input(dest)
     for file_name in os.listdir(source):
+        # print(source,dest)
+        if not os.path.isdir(dest): os.makedirs(dest)
         shutil.move(os.path.join(source,file_name),dest)
     os.rmdir(source)
     #make symlink and hide both that and folder
     with io.open(source,'a',newline='\n') as symlink:
-        symlink.write("gitdir: "+source)
+        dest = dest.replace("\\","/")
+        symlink.write("gitdir: "+dest)
     hide(source)
     hide(dest)
 
@@ -85,6 +89,7 @@ def format_init_args(args):
         elif len(i) == 2 and (i[0] == '-b' or i[0] == '--initial-branch'): branch = i[1]
         elif len(i) == 2 and (i[0] == '--shared'): shared = i[1]
         else: raise ValueError('invalid command',i[0], i)
+    
     return (quiet,bare,template,separate_git_dir,object_format,branch,shared)
 
 def add_files(path,branch):
@@ -157,7 +162,11 @@ def init(args):
         symlink = False
         git_dir = os.getcwd()+bare
     
-    if not os.path.isabs(git_dir): git_dir = os.getcwd()+git_dir[1:]
+    # TODO: I think this may be incorrect code
+    # works if first char is a .
+    git_dir = os.path.abspath(git_dir)
+    git_dir = git_dir.replace("\\","/")
+    #if not os.path.isabs(git_dir): git_dir = os.getcwd()+git_dir[1:]
     
     if is_git_dir(git_dir):
         """
@@ -173,7 +182,7 @@ def init(args):
                 move_dir(git_dir)
         
         re_init(git_dir)
-        if not quiet: print('Reinitialized existing Git repository in '+git_dir)
+        if not quiet: print('Reinitialized existing Git repository in', git_dir)
     else:
         if symlink: 
             """
@@ -188,9 +197,11 @@ def init(args):
             if os.path.isfile(os.getcwd()+'/.git'):
                 print('not a valid git repository')
             elif os.path.isdir(os.getcwd()+'/.git'):
+                if not quiet: print("Reinitialized existing Git repository in "+git_dir)
                 # need to move dir and make symlink
                 move_dir(git_dir)
             else: # git directory does not exist, initialize and make symlink
+                if not quiet: print("Initialized empty Git repository in "+git_dir)
                 add_files(git_dir,branch)
                 hide(git_dir) # hide git_dir folder with command line args
             return # we have done all the symlink work, return to ignore other code
@@ -198,7 +209,7 @@ def init(args):
         # normal init,make directory
         if bare == '/.git' and not(os.path.isdir(git_dir)) and not(symlink):
             os.makedirs(git_dir)
-            subprocess.check_call(["attrib","+H",git_dir])  # hide .git folder
+            os.system(f'attrib +h "{git_dir}"') # hide .git
         # add files, either to ./.git or .
         add_files(git_dir,branch)
         if not quiet: print("Initialized empty Git repository in "+git_dir)
