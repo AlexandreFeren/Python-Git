@@ -1,7 +1,7 @@
 '''
-TODO: hide .git folder after move, move to correct location
-Attempt to create a new version control directory
-Check down file system to see if in repo
+TODO: custom names for git directory ie)
+> git init test
+should create a folder named test with a .git folder inside
 '''
 import os
 import subprocess
@@ -67,6 +67,7 @@ def is_git_dir(path):
     
     
 def format_init_args(args):
+    # https://git-scm.com/docs/git-init
     '''
     quiet: bool
     bare: str: .git by default, '' if flag is set
@@ -107,6 +108,7 @@ def add_files(path,branch):
     with io.open(path+'/HEAD','a+',newline='\n') as HEAD: 
         HEAD.write("ref: refs/heads/"+branch+'\n')
         HEAD.close()
+        
     with io.open(path+'/config','a+',newline='\n') as config:
         config.write("[core]\n\t")
         config.write("repositoryformatversion = 0\n\t")
@@ -115,9 +117,11 @@ def add_files(path,branch):
         config.write("logallrefupdates = true\n\t")
         config.write("symlinks = false\n\t")
         config.write("ignorecase = true")
+        config.close()
 
     with io.open(path+'/description','a+',newline='\n') as desc:
         desc.write("Unnamed repository; edit this file 'description' to name the repository.")
+        desc.close()
 
 def init(args):
     '''

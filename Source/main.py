@@ -5,6 +5,7 @@ constantly run this, awaiting commands for version control.
 import sys
 import os
 import Initialization.init as init
+import Initialization.hash_object as hash_object
 
 class Main:
     '''
@@ -53,7 +54,8 @@ class Main:
         self.commands = {
             "\\Initialization\\":[
                 "init",
-                "clone"
+                "clone",
+                "hash-object"
             ]
         }
 
@@ -61,6 +63,7 @@ class Main:
         path = os.path.dirname(os.path.realpath(__file__))
         for val,key in enumerate(self.commands):
             if args[0] in self.commands[key]:
+                print(key, args)
                 self.dispatch(key,args)
                 return
         print("not a valid command")
@@ -70,10 +73,12 @@ class Main:
         func_dict is a list of functions to call
         based on command line args
         '''
-        func_dict = {"init":init.init}
+        func_dict = {"init":init.init,"hash-object":hash_object.hash_object}
         func_dict[args[0]](args)
 
 if __name__ == '__main__':
     main = Main()
     if len(sys.argv) > 1:
+        print(sys.argv)
         main.call_command(sys.argv[1:])
+        
