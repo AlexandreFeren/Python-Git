@@ -34,7 +34,7 @@ def hash_blob(file_name):
     with open(file_name,'rb') as f:
         contents = f.read()
     full_text = bytes('blob '+str(len(contents))+'\0','utf-8')+contents
-    print(hashlib.sha1(full_text).hexdigest())
+    # print(hashlib.sha1(full_text).hexdigest())
     return
 
 def hash_tree(file_name):

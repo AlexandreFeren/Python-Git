@@ -12,3 +12,4 @@ class TestHashObject(unittest.TestCase):
     '''
     check against predetermined hashes for the Test_Objects folder
     '''
+    
