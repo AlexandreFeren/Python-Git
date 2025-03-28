@@ -1,5 +1,5 @@
 import unittest
-import Initialization.init as init
+import git_clone.Initialization.init as init
 import os,stat
 import sys
 import shutil

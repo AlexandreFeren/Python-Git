@@ -19,3 +19,6 @@ license-files = ["LICEN[CS]E*"]
 [project.urls]
 Homepage = "https://github.com/AlexandreFeren/Python-Git"
 Issues = "https://github.com/AlexandreFeren/Python-Git/issues"
+
+[project.scripts]
+git-clone = "git_clone.command_line:cli"

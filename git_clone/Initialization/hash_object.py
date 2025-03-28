@@ -1,29 +1,7 @@
-import hashlib
+import hashlib, os
 import zlib
-import os
 import sys
 
-"""
-General info about git objects:   
-
-example Blob before compression:
-    blob 15\x00'test content'
-
-example Tree before compression:
-    tree 155\x0040000 Initialization\x00\xae\xf8\xa7\x88\x9a$\xdf|\xce\xf7\x1fCh\x13\xa3\xdb\x96\xd5"_100644 __init__.py\x00\xe6\x9d\xe2\x9b\xb2\xd1\xd6CK\x8b)\xaewZ\xd8\xc2\xe4\x8cS\x91100644 main.py\x00\xbd\x06\x16FG\xe1>\x82\x0f5\xfb\xfc\xe0]\xb9\x90\x03\xcd\xfc\x86100644 test_main.py\x00\xcf\xb9\x17\xc4\xfc\xbc\xe8\xbb1\xee\x86\x9a\xc4t\x0b\xfb\x04\xaa\xbf\xee
-
-example Commit before compression:
-    commit 243\x00tree 169bd833864cf29aac96936653141958adf5962d\nparent 883c1548dc1736535490d7bb83fec8ef0c95488c\nauthor Alex Feren <alexandre.feren@gmail.com> 1736197528 -0500\ncommitter Alex Feren <alexandre.feren@gmail.com> 1736197528 -0500\n\nclean up README.md\n
-
-Blob format: blob <file length><NUL><file contents>
-
-Tree format: tree <byte length><NUL>[<file/dir mode> <file name><NUL><SHA-1 Hash>]*
-    after the <NUL> the contents can be repeated multiple times.
-    byte length is the sum of lengths for everything after the <NUL>
-    
-Commit format: commit <byte length><NUL><current commit hash>\nparent <previous commit hash>\nauthor <name> <email> <timestamp> <timezone>\ncommitter <name> <email> <timestamp> <timezone>\n\n<commit message>\n
-""" 
-# file locations given from the root of the project
 # TODO: Make test that use file locations and the corresponding hashes 
 # files_and_hashes = {"README.md":"a522da6e8c23b4da792335364211fa2ff9efe78a"}
 # folders_and_hashes = {"Source":"6f7831be3fc92736e185c20fadae9d61504dff4e"}
@@ -34,7 +12,7 @@ def hash_blob(file_name):
     with open(file_name,'rb') as f:
         contents = f.read()
     full_text = bytes('blob '+str(len(contents))+'\0','utf-8')+contents
-    # print(hashlib.sha1(full_text).hexdigest())
+    print(hashlib.sha1(full_text).hexdigest())
     return
 
 def hash_tree(file_name):
@@ -113,7 +91,7 @@ def __return_readable_object(hash):
             print(zlib.decompress(contents))
         print(zlib.decompress(contents))
             
-hash_blob("../README.md")
+#hash_blob("../README.md")
 #__return_readable_object("169bd833864cf29aac96936653141958adf5962d")
 #print("-"*50)
 #__return_readable_object("a522da6e8c23b4da792335364211fa2ff9efe78a")

@@ -1,7 +1,7 @@
 """
     Need to understand the .gitignore file to know what to ignore and what to display
 """
-import Tracking_Changes.ls_tree as ls_tree
+import git_clone.Tracking_Changes.ls_tree as ls_tree
 
 def format_status_args():
     '''
