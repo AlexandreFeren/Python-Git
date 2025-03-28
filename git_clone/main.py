@@ -1,20 +1,6 @@
 import sys, os, warnings, argparse
 from glob import glob
 from git_clone.text_colors import *
-
-# parser = argparse.ArgumentParser(
-#     prog='git_clone',
-#     description='Git-like version control system'
-#     )
-# parser = argparse.ArgumentParser()
-# parser.parse_args()
-
-
-
-
-
-
-
 class Main:
     '''
     functions considering adding and rough groupings:
@@ -51,10 +37,10 @@ class Main:
         
         # imports and setting function dictionary
         for path in result: 
-            print("import git_clone.{0}.{1} as {1}".format(".".join(path[:-1]),path[-1][:-3]))
+            #print("import git_clone.{0}.{1} as {1}".format(".".join(path[:-1]),path[-1][:-3]))
             exec("import git_clone.{0}.{1} as {1}".format(".".join(path[:-1]),path[-1][:-3]))
         for fn in result:
-            print("self.commands['{0}'] = {1}.{1}".format(fn[-1][:-3].replace("_","-"),fn[-1][:-3]))
+            #print("self.commands['{0}'] = {1}.{1}".format(fn[-1][:-3].replace("_","-"),fn[-1][:-3]))
             exec("self.commands['{0}'] = {1}.{1}".format(fn[-1][:-3].replace("_","-"),fn[-1][:-3]))
                 
     def call_command(self, args):

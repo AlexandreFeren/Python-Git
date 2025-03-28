@@ -1,34 +1,25 @@
-# https://git-scm.com/docs/git-hash-object
-import hashlib, os
-import zlib
-import sys
-
-
-def format_hash_object_args(args):
-    """
-    minimal implementation currently
-    -t <type>
-    -w
-    """
-    obj_type,write = ('blob',False)
-    for i in range(len(args)):
-        if args[i] == '-t':
-            try:
-                obj_type = args[i+1]
-            except IndexError:
-                print("error: -t flag requires an argument")
-                sys.exit(1)
-        elif args[i] == '-w': write = True
-    return obj_type, write, args[-1]
+# https:/git-scm.com/docs/git-hash-object
+import hashlib, zlib
+import git_clone.text_colors as color
+import warnings
     
 def hash_object(args):
     """
-    target: str (file path)
-    
+    TODO:
+        - Write to objects folder
+        - Accept flags
+        - Support all file formats
+
     if implementing git-cat-file at some point in the future:
-    - https://git-scm.com/docs/gitrevisions
+    - https:/git-scm.com/docs/gitrevisions
     """
-    obj_type,write,target = format_hash_object_args(args)
-    print(obj_type,write,target)
-    
-    print(args)
+    warnings.warn(color.b_colors.WARNING + "hash-object currently defaults to utf-8 with no check" + color.b_colors.END_C)
+    warnings.warn(color.b_colors.WARNING + "hash-object currently cannot write to a file" + color.b_colors.END_C)
+    print()
+    contents = ""
+    with open(args[1]) as f:
+        contents = f.read()
+        contents = bytes(contents,"utf-8")
+    full_text = bytes('blob '+str(len(contents))+'\x00','utf-8')+contents
+    print(hashlib.sha1(full_text).hexdigest())
+    c = zlib.compress(full_text)
