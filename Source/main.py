@@ -1,6 +1,7 @@
-import sys, os, warnings
+import sys, os, warnings, argparse
 from glob import glob
 from text_colors import *
+
 class Main:
     '''
     functions considering adding and rough groupings:
