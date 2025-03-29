@@ -18,8 +18,7 @@ def hash_object(args):
     print()
     contents = ""
     with open(args[1]) as f:
-        contents = f.read()
-        contents = bytes(contents,"utf-8")
+        contents = bytes(f.read(),"utf-8")
     full_text = bytes('blob '+str(len(contents))+'\x00','utf-8')+contents
     print(hashlib.sha1(full_text).hexdigest())
     c = zlib.compress(full_text)
