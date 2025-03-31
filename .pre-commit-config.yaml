@@ -1,8 +1,15 @@
 repos:
   - repo: local
     hooks:
+    - id: unittest
+      name: unittest
+      entry: python -m unittest
+      language: system
+      pass_filenames: false
+      args: ["discover"]
+      stages: ["pre-commit"]
     - id: check-root-dir
       name: Check if commit is from repo root
-      entry: bash -c 'test "$(pwd)" = "$(git rev-parse --show-toplevel)" || (echo "ERROR You must commit from the root of the repository!" && exit 1)'
+      entry: scripts/check-root-dir.sh
       language: system
       stages: ["pre-commit"]
