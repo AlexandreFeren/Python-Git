@@ -20,4 +20,4 @@ This is primarily an exercise for me to better understand source control, with t
 - branch, merge, status, pull, push, fetch, rebase
 
 ##  Sources
-- https://git-scm.com/book/en/v2/ (mostly chapter 10: Git Internals)
+- https://git-scm.com/book/en/v2/ (mostly chapter 10: Git Internals).
