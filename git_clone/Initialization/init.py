@@ -3,13 +3,10 @@ TODO: custom names for git directory ie)
 > git init test
 should create a folder named test with a .git folder inside
 '''
-import os
-import subprocess
-import warnings
-import shutil
+import os, shutil, io
 from platform import system
 from subprocess import call
-import io
+import warnings, git_clone.text_colors as color
 
 def hide(path):
     #hide either folder or file
@@ -22,7 +19,7 @@ def hide(path):
     
 def re_init(git_dir):
     # TODO: pull in templates as needed
-    warnings.warn('reinitialization is not yet implemented')
+    warnings.warn(color.b_colors.WARNING + 'reinitialization is not yet implemented' + color.b_colors.END_C)
 
 def move_dir(dest):
     # TODO: cleanup
