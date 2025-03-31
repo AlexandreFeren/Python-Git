@@ -2,7 +2,7 @@
 import hashlib, zlib
 import git_clone.text_colors as color
 import warnings
-    
+
 def hash_object(args):
     """
     TODO:
