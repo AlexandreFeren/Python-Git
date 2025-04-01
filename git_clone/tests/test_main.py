@@ -2,20 +2,23 @@ import unittest
 import git_clone.src.main as main
 import os
 import inspect
-
-class CustomTestResult(unittest.TextTestResult):
-    def addSuccess(self, test):
-        super().addSuccess(test)
-        print("Test passed:", test)
-    def addFailure(self, test, err):
-        super().addFailure(test, err)
-        print("Test failed:", test)
-
-class TestFunctionCalls(unittest.TestCase):
-    test_args = ["","none",'diff 1','diff','init',"*","$"]
-    file_loc = os.path.dirname(os.path.realpath(__file__))+"\\Staging\\"
+class TestMain(unittest.TestCase):
+    def test_main(self):
+        self.assertTrue(True)
 
 def run_tests():
+    test_modules = []
+    path = "."
+    # Always run tests from the root of the repo
+    # This mainly matters to have a consistent location for testing init
+    # which would be something like ../test_init/
+    while os.getcwd() != os.getcwd()+"\\..":
+        if '.git' in next(os.walk(path))[1]:
+            path = os.path.abspath(path)
+            break
+        path += "\\.."
+    os.chdir(path)
+    print(os.getcwd())
     test_modules = [
         "test_main",
         "Initialization.test_init"

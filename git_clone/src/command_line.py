@@ -1,4 +1,4 @@
-import git_clone.main as main
+import git_clone.src.main as main
 import sys
 
 def cli():

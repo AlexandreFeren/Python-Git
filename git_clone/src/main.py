@@ -41,9 +41,8 @@ class Main:
         for root, dirs, files in os.walk(PATH, topdown=True):
             dirs[:] = [d for d in dirs if d not in exclude]
             result.extend([root.split("\\")[PATH_LEN:] + [f] for f in files if f not in exclude])
-
         for path in result:
-            print('import git_clone.src.{0}.{1} as {1}'.format(".".join(path[:-1]),path[-1][:-3]))
+            #print('import git_clone.src.{0}.{1} as {1}'.format(".".join(path[:-1]),path[-1][:-3]))
             exec("import git_clone.src.{0}.{1} as {1}".format(".".join(path[:-1]),path[-1][:-3]))
         for fn in result:
             exec("self.commands['{0}'] = {1}.{1}".format(fn[-1][:-3].replace("_","-"),fn[-1][:-3]))

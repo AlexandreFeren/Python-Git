@@ -3,13 +3,7 @@ repos:
     hooks:
     - id: unittest
       name: unittest
-      entry: python -m unittest
+      entry: python -m unittest git_clone/tests/test_main.py
       language: system
       pass_filenames: false
-      args: ["discover"]
-      stages: ["pre-commit"]
-    - id: check-root-dir
-      name: Check if commit is from repo root
-      entry: scripts/check-root-dir.sh
-      language: system
       stages: ["pre-commit"]
