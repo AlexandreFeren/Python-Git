@@ -13,11 +13,12 @@ the index is then used to create the commit
 """
 
 import os
-from stat import *
+# from stat import *
 
-def parse_index(fname='Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889'):
+
+def parse_index(fname="Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889"):
     files = []
-    with open(fname,'rb') as f:
+    with open(fname, "rb") as f:
         """
         From https://stackoverflow.com/questions/4084921/what-does-the-git-index-contain-exactly
 
@@ -34,37 +35,47 @@ def parse_index(fname='Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889'):
             160 bit SHA-1 hash of the index contents
 
         """
-        print(os.stat('../.gitignore'))
+        print(os.stat("../.gitignore"))
         index = f.read()
         offset = 12
 
         # Header
-        #input("header:")
-        print("\tSignature:",index[:4].decode('utf-8'))
-        print("\tVersion:",int.from_bytes(index[4:8]))
-        print("\tNumber of index entries:",int.from_bytes(index[8:12]))
+        # input("header:")
+        print("\tSignature:", index[:4].decode("utf-8"))
+        print("\tVersion:", int.from_bytes(index[4:8]))
+        print("\tNumber of index entries:", int.from_bytes(index[8:12]))
 
         # Index Entries
         # input("sorted list of index entries:")
         for _ in range(int.from_bytes(index[8:12])):
-
             # changed timestamp
-            print("\tctime epoch (s)",int.from_bytes(index[offset:4+offset]))
-            print("\tctime epoch (ns)",int.from_bytes(index[4+offset:8+offset]))
+            print("\tctime epoch (s)", int.from_bytes(
+                index[offset: 4 + offset]))
+            print("\tctime epoch (ns)", int.from_bytes(
+                index[4 + offset: 8 + offset]))
             # modified timestamp (metadata)
-            print("\tmtime epoch (s)",int.from_bytes(index[8+offset:12+offset]))
-            print("\tmtime epoch (ns)",int.from_bytes(index[12+offset:16+offset]))
-            #input()
-            print("\n\tdev:", int.from_bytes(index[16+offset:20+offset]))
-            print("\tino:", int.from_bytes(index[10+offset:24+offset]))
+            print("\tmtime epoch (s)", int.from_bytes(
+                index[8 + offset: 12 + offset]))
+            print(
+                "\tmtime epoch (ns)", int.from_bytes(
+                    index[12 + offset: 16 + offset])
+            )
+            # input()
+            print("\n\tdev:", int.from_bytes(index[16 + offset: 20 + offset]))
+            print("\tino:", int.from_bytes(index[10 + offset: 24 + offset]))
 
-            print("\tmode:", hex(int.from_bytes(index[24+offset:28+offset])))
-            print("\tuid:", int.from_bytes(index[28+offset:32+offset]))
-            print("\tgid:", int.from_bytes(index[32+offset:36+offset]))
-            print("\tsize:", int.from_bytes(index[36+offset:40+offset]))
-            print("\tSHA-1 hash:", hex(int.from_bytes(index[40+offset:60+offset])))
+            print("\tmode:", hex(int.from_bytes(
+                index[24 + offset: 28 + offset])))
+            print("\tuid:", int.from_bytes(index[28 + offset: 32 + offset]))
+            print("\tgid:", int.from_bytes(index[32 + offset: 36 + offset]))
+            print("\tsize:", int.from_bytes(index[36 + offset: 40 + offset]))
+            print(
+                "\tSHA-1 hash:", hex(int.from_bytes(
+                    index[40 + offset: 60 + offset]))
+            )
 
-            print("\tflags:", hex(int.from_bytes(index[60+offset:62+offset])))
+            print("\tflags:", hex(int.from_bytes(
+                index[60 + offset: 62 + offset])))
             # beyond here is only v3/v4+
             # only working with v2 for now
 
@@ -72,12 +83,12 @@ def parse_index(fname='Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889'):
             print("\tfile name: ", end="")
             filename = ""
             while index[62 + offset] != 0:
-                print(chr(index[62+offset]),end = "")
-                filename += chr(index[62+offset])
+                print(chr(index[62 + offset]), end="")
+                filename += chr(index[62 + offset])
                 offset += 1
             files.append(filename)
-            print('\n')
-            #input('\nend of fname')
+            print("\n")
+            # input('\nend of fname')
             offset += 62
             # variable nul bytes:
             # 1-8 nul bytes as necessary to pad the entry
@@ -87,7 +98,7 @@ def parse_index(fname='Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889'):
                 offset += 1
 
         # Extensions
-        print('Signature:',index[offset:offset+4].decode('utf-8'))
+        print("Signature:", index[offset: offset + 4].decode("utf-8"))
         # TREE          - trees that existed in the index at the time of last commit
         # REUC          - resolve undo data, saved here when resolved
         # link          - split index mode specific, no plans to implement
@@ -98,24 +109,28 @@ def parse_index(fname='Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889'):
         # sdir (v5+)    - sparse directory entries
         return files
 
-def generate_index(index_path, root = '.'):
+
+def generate_index(index_path, root="."):
     """
     take the existing index, parse it, and create a new index file
     """
 
-    files = parse_index(index_path)
+    # files = parse_index(index_path)
 
-    #get parent directory while it exists and we have not found the .git folder
-    while not '.git' in os.listdir(root) and os.path.abspath(root) != os.path.abspath('..\\'+root):
-        root = '..\\'+root
+    # get parent directory while it exists and we have not found the .git folder
+    while ".git" not in os.listdir(root) and os.path.abspath(root) != os.path.abspath(
+        "..\\" + root
+    ):
+        root = "..\\" + root
     root = os.path.abspath(root)
     # print(os.listdir(root))
     for i in os.listdir(root):
-        print(root+'\\'+i)
+        print(root + "\\" + i)
 
-    #ist_files(root)
+    # ist_files(root)
 
     # traverse the tree and note tracked/untracked files
+
 
 def add():
     """

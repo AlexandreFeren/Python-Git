@@ -1,13 +1,11 @@
-import os, shutil, io
-from platform import system
-from subprocess import call
-import warnings, git_clone.src.text_colors as color
+import os
+
 
 def format_init_args(args):
     # https://git-scm.com/docs/git-init
-    '''
+    """
     set variables to match format of command line args
-    
+
     quiet: bool
     bare: str: .git by default, '' if flag is set
     template: str (file path)
@@ -15,22 +13,39 @@ def format_init_args(args):
     object-format : str (sha1 or sha256)
     branch: str (main branch name/branch to make name)
     shared: str ([unmask|false|group|true|all|world|everybody|0xxx (octal))
-    '''
+    """
     for i in range(len(args)):
-        args[i] = args[i].split('=')
-    quiet, bare, template,separate_git_dir,object_format,branch,shared = (False,'/.git','','','sha1','master','group')
+        args[i] = args[i].split("=")
+    quiet, bare, template, separate_git_dir, object_format, branch, shared = (
+        False,
+        "/.git",
+        "",
+        "",
+        "sha1",
+        "master",
+        "group",
+    )
 
     for i in args:
-        if len(i) == 1 and (i[0] == '--quiet' or i[0] == '-q'): quiet = True
-        elif len(i) == 1 and (i[0] == '--bare'): bare=''
-        elif len(i) == 2 and (i[0] == '--template'): template = i[1].replace('\\','/')
-        elif len(i) == 2 and (i[0] == '--separate-git-dir'): separate_git_dir = i[1].replace('\\','/')
-        elif len(i) == 2 and (i[0] == '--object-format'): object_format = i[1]
-        elif len(i) == 2 and (i[0] == '-b' or i[0] == '--initial-branch'): branch = i[1]
-        elif len(i) == 2 and (i[0] == '--shared'): shared = i[1]
-        else: raise ValueError('invalid command',i[0], i)
+        if len(i) == 1 and (i[0] == "--quiet" or i[0] == "-q"):
+            quiet = True
+        elif len(i) == 1 and (i[0] == "--bare"):
+            bare = ""
+        elif len(i) == 2 and (i[0] == "--template"):
+            template = i[1].replace("\\", "/")
+        elif len(i) == 2 and (i[0] == "--separate-git-dir"):
+            separate_git_dir = i[1].replace("\\", "/")
+        elif len(i) == 2 and (i[0] == "--object-format"):
+            object_format = i[1]
+        elif len(i) == 2 and (i[0] == "-b" or i[0] == "--initial-branch"):
+            branch = i[1]
+        elif len(i) == 2 and (i[0] == "--shared"):
+            shared = i[1]
+        else:
+            raise ValueError("invalid command", i[0], i)
 
-    return (quiet,bare,template,separate_git_dir,object_format,branch,shared)
+    return (quiet, bare, template, separate_git_dir, object_format, branch, shared)
+
 
 def get_git_dir():
     """
@@ -38,29 +53,35 @@ def get_git_dir():
     if there is a link, return the location the link points to (TODO)
     """
     path = "."
-    while os.getcwd() != os.getcwd()+"\\..":
-        if '.git' in next(os.walk(path))[1]: return os.path.abspath(path)
+    while os.getcwd() != os.getcwd() + "\\..":
+        if ".git" in next(os.walk(path))[1]:
+            return os.path.abspath(path)
         path += "\\.."
     return False
 
+
 def valid_git_dir(path):
-    '''
+    """
     return repo path if there is an existing valid repo, else False
     else - return false if no existing symlink | raise error if there is an existing symlink
-    '''
-    expected_dirs = ['hooks','info','objects','refs']
-    expected_files = ['HEAD','config','description']
-    
-    for _,dirs,files in os.walk(path):
-        if (all([d in dirs for d in expected_dirs]) and 
-            all([f in files for f in expected_files])): return True
+    """
+    expected_dirs = ["hooks", "info", "objects", "refs"]
+    expected_files = ["HEAD", "config", "description"]
+
+    for _, dirs, files in os.walk(path):
+        if all([d in dirs for d in expected_dirs]) and all(
+            [f in files for f in expected_files]
+        ):
+            return True
         return False
 
-def move_dir(src,dest):
+
+def move_dir(src, dest):
     return
 
-def init(args,debug=False):
-    '''
+
+def init(args, debug=False):
+    """
     initialize git repository, just make skeleton by default.
     git init <flags>
         [-q|--quiet]
@@ -88,12 +109,14 @@ def init(args,debug=False):
                 bit meaning - <read><write><execute>
                     - full permissions: 0111
                     - no permissions:   0000
-    '''
+    """
     # symlink can just be separate_git_dir?
-    quiet,bare,template,separate_git_dir,object_format,branch,shared = format_init_args(args[1:])
+    quiet, bare, template, separate_git_dir, object_format, branch, shared = (
+        format_init_args(args[1:])
+    )
     curr_git_dir = get_git_dir()
     print("test")
-    if curr_git_dir:    # reinitializing
+    if curr_git_dir:  # reinitializing
         if valid_git_dir(curr_git_dir):
             """
             -b|--initial-branch should be ignored here
@@ -104,7 +127,7 @@ def init(args,debug=False):
             else:
                 raise NotImplementedError("separate git dir not implemented")
                 # reinitialize at remote location
-                move_dir(curr_git_dir,separate_git_dir)
+                move_dir(curr_git_dir, separate_git_dir)
                 pass
     # else:
     #     if symlink:
@@ -124,7 +147,7 @@ def init(args,debug=False):
     #             # need to move dir and make symlink
     #             move_dir(git_dir)
     #         else: # git directory does not exist, initialize and make symlink
-                
+
     #             if not quiet: print("Initialized empty Git repository in "+git_dir)
     #             add_files(git_dir,branch)
     #             hide(git_dir) # hide git_dir folder with command line args
