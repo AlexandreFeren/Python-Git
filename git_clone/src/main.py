@@ -78,6 +78,7 @@ class Main:
                     + color.b_colors.END_C
                 )
         else:
+            print(args)
             warnings.warn(
                 color.b_colors.WARNING
                 + "Command '{}' not found".format(args[0])

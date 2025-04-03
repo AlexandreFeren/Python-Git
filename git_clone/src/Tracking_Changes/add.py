@@ -22,7 +22,6 @@ def parse_index(fname="Dev_Notes/Git_Internal_Files/Index/index_at_f6c5889"):
         """
         From https://stackoverflow.com/questions/4084921/what-does-the-git-index-contain-exactly
 
-
         4 byte signature: DIRC (dircache)
         4 byte version number (currently 0x0002)
         32 bit number of index entries
