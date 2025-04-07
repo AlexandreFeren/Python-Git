@@ -68,7 +68,10 @@ def add_files(branch, path=os.getcwd()):
         os.makedirs(path+'/refs/heads')
     if not os.path.isdir(path+'/refs/tags'):
         os.makedirs(path+'/refs/tags')
-    io.open(path+'/info/exclude', 'a+', newline='\n')
+
+    with io.open(path+'/info/exclude', 'a+', newline='\n') as exclude:
+        exclude.close()
+
     with io.open(path+'/HEAD', 'a+', newline='\n') as HEAD:
         HEAD.write("ref: refs/heads/"+branch+'\n')
         HEAD.close()
@@ -95,7 +98,7 @@ def get_git_dir():
     if there is a link, return the location the link points to (TODO)
     """
     path = os.getcwd()
-    print("calling command from " + os.getcwd())
+    # print("calling command from " + os.getcwd())
     while os.path.abspath(path) != os.path.abspath(path + "\\.."):
         if ".git" in os.listdir(path):
             return path
@@ -119,13 +122,17 @@ def valid_git_dir(path):
     """
     expected_dirs = ["hooks", "info", "objects", "refs"]
     expected_files = ["HEAD", "config", "description"]
-
-    for _, dirs, files in os.walk(path):
-        if all([d in dirs for d in expected_dirs]) and all(
-            [f in files for f in expected_files]
-        ):
-            return True
-        return False
+    if os.path.isdir(path):
+        for _, dirs, files in os.walk(path):
+            if all([d in dirs for d in expected_dirs]) and all(
+                [f in files for f in expected_files]
+            ):
+                return True
+            return False
+    else:
+        # input("path: {}".format(path))
+        with io.open(path) as file:
+            return valid_git_dir(file.read().split()[1])
 
 
 def move_dir(src, dest):
@@ -169,8 +176,8 @@ def init(args, debug=False):
                     - full permissions: 0111
                     - no permissions:   0000
     """
-    warnings.warn(color.b_colors.WARNING +
-                  "TODO: file permissions have not been configured properly yet"+color.b_colors.END_C)
+    # print(color.b_colors.WARNING +
+    #       "TODO: file permissions have not been configured properly yet"+color.b_colors.END_C)
     quiet, bare, template, separate_git_dir, object_format, branch, shared = (
         format_init_args(args[1:])
     )
@@ -178,24 +185,31 @@ def init(args, debug=False):
         raise ValueError(
             "fatal: options '--separate-git-dir' and '--bare' cannot be used together")
     curr_git_dir = get_git_dir()
-    print("bare:", bare, "separate", separate_git_dir, "branch:", branch)
 
     # bare inits behave differently than the rest
     if bare:
         if not valid_git_dir(os.getcwd()):
             add_files(branch)
+            if not quiet:
+                # TODO: unittest
+                print(
+                    "Initialized empty Git repository in {}/".format(os.getcwd().replace("\\", "/")))
         else:
-            warnings.warn(color.b_colors.WARNING +
-                          "reinitialize bare repo not implemented"+color.b_colors.END_C)
+            # TODO: unittest
+            print(color.b_colors.WARNING +
+                  "reinitialize bare is not being tested/maintained"+color.b_colors.END_C)
     elif not curr_git_dir:  # has not been initialized yet
         curr_git_dir = os.getcwd()
         if separate_git_dir == "":
-            print("normal init")
+            # print("normal init")
             add_files(branch, os.getcwd()+"/.git")
             hide(os.getcwd()+"/.git")
+            if not quiet:
+                print(
+                    "Initialized empty Git repository in {}/.git/".format(os.getcwd().replace("\\", "/")))
         else:
             # .git file, not folder is location of src.
-            print("remote init", separate_git_dir)
+            # print("remote init", separate_git_dir)
             with io.open(os.getcwd()+"/.git", 'a+', newline='\n') as f:
                 f.write("gitdir: " +
                         os.path.abspath(separate_git_dir)
@@ -205,13 +219,26 @@ def init(args, debug=False):
             if (separate_git_dir.split("\\")[-1][0] == "." or
                     separate_git_dir.split("/")[-1][0] == "."):
                 hide(separate_git_dir)
+            if not quiet:
+                print(
+                    "Initialized empty Git repository in {}/".format(separate_git_dir.replace("\\", "/")))
     else:  # has been initialized
         if os.path.isfile(".git"):  # remote
+            if not quiet:
+                print(
+                    "Reinitialized existing Git repository in {}/".format(separate_git_dir.replace("\\", "/")))
             warnings.warn(color.b_colors.WARNING +
                           "reinitialize remote not implemented"+color.b_colors.END_C)
         elif separate_git_dir:  # move existing file
+            # TODO: unittest
+            if not quiet:
+                print(
+                    "Reinitialized existing Git repository in {}/".format(separate_git_dir.replace("\\", "/")))
             warnings.warn(color.b_colors.WARNING +
                           "reinit remote not implemented"+color.b_colors.END_C)
         else:  # standard reinit
-            warnings.warn(color.b_colors.WARNING +
-                          "reinit not implemented"+color.b_colors.END_C)
+            if not quiet:
+                print(
+                    "Reinitialized existing Git repository in {}/.git/".format(os.getcwd().replace("\\", "/")))
+            # warnings.warn(color.b_colors.WARNING +
+            #               "reinit not implemented"+color.b_colors.END_C)

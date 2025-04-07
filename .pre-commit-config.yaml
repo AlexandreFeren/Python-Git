@@ -22,9 +22,7 @@ repos:
     hooks:
     - id: unittest
       name: unittest
-      entry: python -c "import os, subprocess;
-              os.chdir(subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip().decode());
-              import unittest; unittest.main(module='git_clone.tests.test_main', exit=True)"
+      entry: python -m unittest discover git_clone/tests
       language: system
       pass_filenames: false
       stages: ["pre-commit"]
