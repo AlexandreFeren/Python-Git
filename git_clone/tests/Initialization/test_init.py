@@ -219,8 +219,9 @@ class TestInit(unittest.TestCase):
         with contextlib.redirect_stdout(output):
             init.init(["init"])  # prime to reinit
         output.close()
-        # self.compare_output(["init"],False)
-        # self._test_valid_git_dir()
+
+        self.compare_output(["init"], False)
+        self._testValidGitDir()
 
         self.compare_output(["init", "-q"], False)
         self._testValidGitDir()
